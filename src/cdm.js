@@ -1,7 +1,7 @@
 import { registerCompendiumSettings } from "./compendium.js";
 import { MODULE_ID } from "./constants.js";
 import Log from "./log.js";
-import { registerStorageSettings } from "./storage.js";
+import { loadFiles, registerStorageSettings } from "./storage.js";
 
 Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(MODULE_ID);
@@ -15,6 +15,10 @@ Hooks.once("init", function() {
 
 Hooks.once("ready", function() {
   Log.info("This code runs once core initialization is ready and game data is available.");
+
+  loadFiles().then(data => {
+    Log.info("File Data:", data)
+  });
 
   // const ITEM = {
   //   type: "tool",
