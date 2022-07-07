@@ -1,0 +1,19 @@
+{
+  "name": "cdm",
+  "version": "0.0.1",
+  "description": "Management of custom documents made simple for FoundryVTT",
+  "main": "src/citemm.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bzvestey/cdm.git"
+  },
+  "author": "Bryan Vestey",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/bzvestey/cdm/issues"
+  },
+  "homepage": "https://github.com/bzvestey/cdm#readme"
+}
