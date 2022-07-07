@@ -23,6 +23,57 @@
   "styles": [
     "styles/citemm.css"
   ],
+  "packs": [
+      {
+          "name": "cdm-creatures",
+          "label": "CDM Creatures",
+          "path": "./packs/creatures.db",
+          "entity": "Actor",
+          "type": "Actor"
+      },
+      {
+          "name": "cdm-items",
+          "label": "CDM Items",
+          "path": "./packs/items.db",
+          "entity": "Item",
+          "type": "Item"
+      },
+      {
+          "name": "cdm-scenes",
+          "label": "CDM Scenes",
+          "path": "./packs/scenes.db",
+          "entity": "Scene",
+          "type": "Scene"
+      },
+      {
+          "name": "cdm-journal-entries",
+          "label": "CDM Journal Entries",
+          "path": "./packs/journal-entries.db",
+          "entity": "JournalEntry",
+          "type": "JournalEntry"
+      },
+      {
+          "name": "cdm-macros",
+          "label": "CDM Macros",
+          "path": "./packs/macros.db",
+          "entity": "Macro",
+          "type": "Macro"
+      },
+      {
+          "name": "cdm-roll-tables",
+          "label": "CDM Roll Tables",
+          "path": "./packs/roll-tables.db",
+          "entity": "RollTable",
+          "type": "RollTable"
+      },
+      {
+          "name": "cdm-playlists",
+          "label": "CDM Playlists",
+          "path": "./packs/playlists.db",
+          "entity": "Playlist",
+          "type": "Playlist"
+      }
+  ],
   "languages": [
     {
       "lang": "en",

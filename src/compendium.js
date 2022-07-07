@@ -26,5 +26,5 @@ export function getCompendiumModule() {
 
 export function getItemPack() {
   // TODO: Be able to specify the name of the pack
-  return game.modules.get(getCompendiumModule()).pack.find(p => p.entity === "Item");
+  return game.modules.get(getCompendiumModule()).pack.find(p => p.type === "Item");
 }
