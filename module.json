@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
-  "name": "citemm",
+  "name": "cdm",
   "title": "Custom Document Management",
   "description": "Management of custom documents made simple.",
   "authors": [
@@ -11,7 +11,7 @@
 
   "url": "https://github.com/bzvestey/cdm",
   "manifest": "https://raw.githubusercontent.com/bzvestey/cdm/master/module.json",
-  "download": "https://github.com/bzvestey/cdm/releases/download/release-0.0.1/citemm-0.0.1.zip",
+  "download": "https://github.com/bzvestey/cdm/releases/download/release-0.0.1/cdm-0.0.1.zip",
   "license": "LICENSE",
   "readme": "README.md",
   "bugs": "https://github.com/bzvestey/cdm/issues",
@@ -19,9 +19,9 @@
 
   "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
-  "esmodules": ["src/citemm.js"],
+  "esmodules": ["src/cdm.js"],
   "styles": [
-    "styles/citemm.css"
+    "styles/cdm.css"
   ],
   "packs": [
       {

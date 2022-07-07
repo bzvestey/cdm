@@ -1,4 +1,4 @@
-export const MODULE_ID = "citemm"
+export const MODULE_ID = "cdm"
 
 export const FLAGS = Object.freeze({
   MANAGED: "managed",
@@ -6,5 +6,5 @@ export const FLAGS = Object.freeze({
 });
 
 export const TEMPLATES = Object.freeze({
-  DIALOG: 'modules/${this.ID}/templates/citemm.hbs'
+  DIALOG: 'modules/${this.ID}/templates/cdm.hbs'
 });

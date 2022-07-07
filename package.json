@@ -2,7 +2,7 @@
   "name": "cdm",
   "version": "0.0.1",
   "description": "Management of custom documents made simple for FoundryVTT",
-  "main": "src/citemm.js",
+  "main": "src/cdm.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
