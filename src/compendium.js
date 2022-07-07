@@ -4,6 +4,7 @@ import Log from "./log.js";
 const COMPENDIUM_MODULE_SETTING = "compendium-module"
 
 export function registerCompendiumSettings() {
+  const choices = {};
   game.modules.forEach(m => {
     Log.info(m.id, m.data.title)
     choices[m.id] = m.data.title
