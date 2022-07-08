@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/bzvestey/cdm/issues"
   },
-  "homepage": "https://github.com/bzvestey/cdm#readme"
+  "homepage": "https://github.com/bzvestey/cdm#readme",
+  "dependencies": {
+    "yaml": "^2.1.1"
+  }
 }

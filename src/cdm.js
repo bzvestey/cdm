@@ -1,5 +1,6 @@
 import { registerCompendiumSettings } from "./compendium.js";
 import { MODULE_ID } from "./constants.js";
+import { createDocuments } from "./document.js";
 import Log from "./log.js";
 import { loadFiles, registerStorageSettings } from "./storage.js";
 
@@ -17,7 +18,7 @@ Hooks.once("ready", function() {
   Log.info("This code runs once core initialization is ready and game data is available.");
 
   loadFiles().then(data => {
-    Log.info("File Data:", data)
+    createDocuments(data)
   });
 
   // const ITEM = {
@@ -35,6 +36,8 @@ Hooks.once("ready", function() {
 
   //   Item.create({})
   // }
+
+  // Item.create({"name": "test create 1", type: "weapon", data: { attackBonus: 10}, flags: { citemm: {managed: true}}}).then(i => mi.importDocument(i).then(() => Item.deleteDocuments([i.id])))
 });
 
 // TODO: Make the storage settings nicer

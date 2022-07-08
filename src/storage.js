@@ -1,8 +1,9 @@
+import YAML from "../node_modules/yaml/browser/index.js";
 import { MODULE_ID } from "./constants.js";
 import Log from "./log.js";
 
-export const STORAGE_FOLDER = "storage_folder";
-export const STORAGE_FOLDER_SOURCE = "storage_folder_source"
+const STORAGE_FOLDER = "storage_folder";
+const STORAGE_FOLDER_SOURCE = "storage_folder_source"
 
 
 function dataFolder() {
@@ -10,11 +11,9 @@ function dataFolder() {
 }
 
 export function registerStorageSettings() {
-  // TODO: Add some labels about what this really is
-  
   game.settings.register(MODULE_ID, STORAGE_FOLDER, {
     scope: 'world',
-    config: true,
+    config: false,
     type: String,
     default: `worlds/${game.world.id}/${MODULE_ID}`,
     onChange: async () => {
@@ -23,12 +22,10 @@ export function registerStorageSettings() {
   });
   game.settings.register(MODULE_ID, STORAGE_FOLDER_SOURCE, {
     scope: 'world',
-    config: true,
+    config: false,
     type: String,
     default: 'data',
   });
-
-  // TODO: Button to reload the information
 
   createArchiveFolderIfMissing();
 }
@@ -66,7 +63,7 @@ export async function loadFiles() {
 async function getAllFiles(parent, dirPath) {
   const data = await FilePicker.browse(parent, dirPath);
   Log.info(data)
-  return data.files.concat((await Promise.all(data.dirs.map(subDir => getAllFiles(parent, subDir)))).filter(Boolean).flat())
+  return data.files.concat((await Promise.all(data.dirs.map(subDir => getAllFiles(parent, subDir)))).flat().filter(Boolean))
 }
 
 async function loadFileData(filePath) {
@@ -77,16 +74,25 @@ async function loadFileData(filePath) {
     Log.warn("Failed to load file", filePath)
     return null
   }
-  
+
   switch(filePath.split(".").pop()) {
     case "json": {
-      return await data.json();
+      const pdata = await data.json();
+      return Array.isArray(pdata) ? pdata.map(d => updateFileData(d, filePath)) : updateFileData(pdata, filePath)
     }
     case "yml":
     case "yaml": {
       const body = await data.text();
-      // TODO: parse the yaml...
-      return body;
+      return YAML.parseAllDocuments(body).map(d => updateFileData(d.toJSON(), filePath));
     }
   }
+}
+
+function updateFileData(doc, filePath) {
+  if (typeof doc !== 'object') {
+    Log.warn("Null or Undefined document supplied:", doc)
+    return null
+  }
+  
+  return { ...doc, filePath };
 }
