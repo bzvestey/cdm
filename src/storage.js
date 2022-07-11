@@ -1,5 +1,6 @@
 import YAML from "../node_modules/yaml/browser/index.js";
 import { MODULE_ID } from "./constants.js";
+import { generateNewId } from "./document.js";
 import Log from "./log.js";
 
 const STORAGE_FOLDER = "storage_folder";
@@ -77,15 +78,57 @@ async function loadFileData(filePath) {
 
   switch(filePath.split(".").pop()) {
     case "json": {
-      const pdata = await data.json();
-      return Array.isArray(pdata) ? pdata.map(d => updateFileData(d, filePath)) : updateFileData(pdata, filePath)
+      return await fixFileData(await data.json(), filePath, false);
     }
     case "yml":
     case "yaml": {
       const body = await data.text();
-      return YAML.parseAllDocuments(body).map(d => updateFileData(d.toJSON(), filePath));
+      return await fixFileData(YAML.parseAllDocuments(body).map(d => d.toJSON()), filePath, true);
     }
   }
+}
+
+function fixFileDoc(doc) {
+  if (typeof doc !== 'object' || !!doc.id) return { doc, updated: false};
+  return { doc: {
+    ...doc,
+    id: generateNewId()
+  }, updated: true}
+}
+
+async function fixFileData(docs, filePath, isYaml) {
+  let needsSave = false;
+  let final = [];
+
+  if (Array.isArray(docs)) {
+    needsSave = docs.reduce((needsSave, cur) => {
+      const {doc, updated} = fixFileDoc(cur);
+      final.push(doc);
+      return needsSave || updated;
+    }, needsSave)
+  } else {
+    const {doc, updated} = fixFileDoc(docs);
+    final.push(doc);
+    needsSave = updated;
+  }
+
+  if (needsSave) {
+    const parent = dataFolder()
+    const pathParts = filePath.split("/");
+    const fileName = pathParts.pop();
+    const path = pathParts.join("/");
+
+    let data = null;
+    if (isYaml) {
+      data = new File([YAML.stringify(final)], fileName, { type: "application/yaml" })
+    } else {
+      data = new File([JSON.stringify(Array.isArray(docs)? final : final[0], null, 2)], fileName, { type: "application/json"})
+    }
+
+    await FilePicker.upload(parent, path, data, {})
+  }
+
+  return final.map(d => updateFileData(d, filePath))
 }
 
 function updateFileData(doc, filePath) {

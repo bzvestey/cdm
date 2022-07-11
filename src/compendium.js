@@ -2,9 +2,22 @@ import { MODULE_ID } from "./constants.js";
 import Log from "./log.js";
 
 const COMPENDIUM_MODULE_SETTING = "compendium-module"
-const COMPENDIUM_ALLOW_DELETE_SETTING = "compendium-allow-delete"
+const COMPENDIUM_ALLOW_DELETE_COMPENDIUM_SETTING = "compendium-allow-delete-compendium"
+const COMPENDIUM_ALLOW_DELETE_WORLD_SETTING = "compendium-allow-delete-world"
 const COMPENDIUM_FORCE_UNIQUE = "compendium-force-unique"
 const COMPENDIUM_SKIP_ADD = "compendium-skip-add"
+
+export class Compendium {
+  //
+
+  constructor() {
+    //
+  }
+
+  static async fromFiles(fileData) {
+    //
+  }
+}
 
 export function registerCompendiumSettings() {
   const choices = {};
@@ -22,8 +35,16 @@ export function registerCompendiumSettings() {
     default: MODULE_ID
   });
 
-  game.settings.register(MODULE_ID, COMPENDIUM_ALLOW_DELETE_SETTING, {
+  game.settings.register(MODULE_ID, COMPENDIUM_ALLOW_DELETE_COMPENDIUM_SETTING, {
     name: "Delete items from compendium",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
+  game.settings.register(MODULE_ID, COMPENDIUM_ALLOW_DELETE_WORLD_SETTING, {
+    name: "Delete items from world",
     scope: "world",
     config: true,
     type: Boolean,
@@ -52,7 +73,16 @@ export function getCompendiumModule() {
 }
 
 export function shouldDeleteMissingItems() {
-  return !game.settings.get(MODULE_ID, COMPENDIUM_ALLOW_DELETE_SETTING) || game.settings.get(MODULE_ID, COMPENDIUM_SKIP_ADD)
+  return game.settings.get(MODULE_ID, COMPENDIUM_ALLOW_DELETE_COMPENDIUM_SETTING) ||
+         game.settings.get(MODULE_ID, COMPENDIUM_ALLOW_DELETE_WORLD_SETTING)
+}
+
+export function shouldDeleteCompendiumItems() {
+  return game.settings.get(MODULE_ID, COMPENDIUM_ALLOW_DELETE_COMPENDIUM_SETTING);
+}
+
+export function shouldDeleteWorldItems() {
+  return game.settings.get(MODULE_ID, COMPENDIUM_ALLOW_DELETE_WORLD_SETTING);
 }
 
 export function forceUniqueNames() {
@@ -90,10 +120,25 @@ export async function getDocsForCompendiumType(docType) {
 }
 
 export async function deleteCompendiumItems(docType, ids) {
-  // TODO: Delete items imported to the game?
-  const c = getPackForDocType(docType);
+  if (shouldDeleteCompendiumItems()) {
+    const c = getPackForDocType(docType);
+    await Promise.all(ids.map(id => c.delete(id)))
+  }
 
-  await Promise.all(ids.map(id => c.delete(id)))
+  if (!shouldDeleteWorldItems()) return;
+
+  // TODO: Support more than just items
+  switch(docType) {
+    case "Item": {
+      const toDelete = ids.filter(id => game.items.has(id))
+      if (toDelete.length) {
+        await Item.deleteDocuments(toDelete)
+      }
+    }
+    default: {
+      Log.error("Tried to delete unsupported doc type:", docType)
+    }
+  }
 }
 
 export async function addCompendiumItems(docType, items) {
