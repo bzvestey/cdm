@@ -1,10 +1,11 @@
-export const MODULE_ID = "cdm"
+export const MODULE_ID = "cdm";
 
-export const FLAGS = Object.freeze({
+export const Flags = Object.freeze({
   ID: "id",
-  FILE_PATH: "filePath"
+  FILE_PATH: "filePath",
+  ERROR: "error",
 });
 
-export const TEMPLATES = Object.freeze({
-  DIALOG: 'modules/${this.ID}/templates/cdm.hbs'
+export const Templates = Object.freeze({
+  DIALOG: "modules/${this.ID}/templates/cdm.hbs",
 });

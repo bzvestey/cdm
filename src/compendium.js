@@ -1,5 +1,6 @@
 import { MODULE_ID } from "./constants.js";
 import Log from "./log.js";
+import { loadFiles } from "./storage.js";
 
 const COMPENDIUM_MODULE_SETTING = "compendium-module"
 const COMPENDIUM_ALLOW_DELETE_COMPENDIUM_SETTING = "compendium-allow-delete-compendium"
@@ -7,17 +8,100 @@ const COMPENDIUM_ALLOW_DELETE_WORLD_SETTING = "compendium-allow-delete-world"
 const COMPENDIUM_FORCE_UNIQUE = "compendium-force-unique"
 const COMPENDIUM_SKIP_ADD = "compendium-skip-add"
 
-export class Compendium {
+const CompendiumUpdaterStatus = Object.freeze({
+  NOT_STARTED: "not_started",
+  PREPARING: "preparing",
+  DISPLAYING: "displaying",
+  MODIFYING: "modifying",
+  DONE: 'done'
+});
+
+export class CompendiumUpdater {
+  /**
+   * The current status of the compendium updater.
+   * 
+   * @type {CompendiumUpdaterStatus}
+   */
+  status = CompendiumUpdaterStatus.NOT_STARTED;
+
   //
 
   constructor() {
     //
   }
 
-  static async fromFiles(fileData) {
-    //
+  async startPreparingData() {
+    this.status = CompendiumUpdaterStatus.PREPARING;
+    const filesByCompendium = await loadInformationFromFiles();
   }
 }
+
+async function loadInformationFromFiles() {
+  const fileData = await loadFiles();
+
+  return fileData.reduce((comp, cur) => {
+    const doc = updateDocData(cur);
+    if (doc) {
+      if (!Array.isArray(comp[cur.docType])) {
+        comp[cur.docType] = [];
+      }
+      comp[cur.docType].push(doc);
+    }
+    return comp;
+  }, {});
+}
+
+/**
+ * Converts the document from how it is expected to be in the file saved to
+ * disk to how FoundryVTT expects it to be.
+ *
+ * @param {Record<string, any>} doc The document in the file format.
+ * @returns The document in the FoundryVTT format.
+ */
+function updateDocData(doc) {
+  const error = doc.error;
+  // When a system is defined, make sure it is the same as the one being used in
+  // the world.
+  if (!error &&
+    doc.system &&
+    !(
+      doc.system === game.system.id ||
+      (Array.isArray(doc.system) && doc.system.includes(game.system.id))
+    )
+  ) {
+    Log.error("Current system not supported by document:", doc);
+    error = `Document does not support the game system "${game.system.id}"`;
+  }
+
+  // Make sure that the document type exists and that the given type is valid.
+  const dType = game.system.documentTypes[doc.docType];
+  if (!error &&
+    (!dType ||
+    (doc.type === doc.docType && dType.includes("base")) ||
+    !dType.includes(doc.type))
+  ) {
+    Log.error("Invalid docType/type combo:", doc);
+    error = `Document has an unsupported document type "${doc.docType}"`;
+  }
+
+  // return the final document data.
+  return {
+    type: doc.type,
+    name: doc.name,
+    icon: doc.icon,
+    data: doc.data,
+    flags: {
+      [MODULE_ID]: {
+        [Flags.ERROR]: error,
+        [Flags.ID]: doc.id,
+        [Flags.FILE_PATH]: doc.filePath,
+      },
+    },
+  };
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 export function registerCompendiumSettings() {
   const choices = {};

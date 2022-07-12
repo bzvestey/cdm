@@ -6,7 +6,7 @@ import {
   getPackForDocType,
   shouldDeleteMissingItems
 } from "./compendium.js";
-import { FLAGS, MODULE_ID } from "./constants.js";
+import { Flags, MODULE_ID } from "./constants.js";
 import Log from "./log.js";
 
 export async function createDocuments(fileData) {
@@ -115,8 +115,8 @@ function updateDocData(doc) {
     data: doc.data,
     flags: {
       [MODULE_ID]: {
-        [FLAGS.ID]: doc.id ?? generateNewId(),
-        [FLAGS.FILE_PATH]: doc.filePath,
+        [Flags.ID]: doc.id ?? generateNewId(),
+        [Flags.FILE_PATH]: doc.filePath,
       },
     },
   };
