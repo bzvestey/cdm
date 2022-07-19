@@ -1,0 +1,51 @@
+{{#if isLoadingData}}
+<p>The information is being loaded from files and checked against the current status of the world, please wait...</p>
+{{/if}}
+
+{{#if isUpdatingContent}}
+<p>The documents are being updates, please wait...</p>
+{{/if}}
+
+{{#if isDone}}
+<p>Everything is done updating! You can now close this window.</p>
+{{/if}}
+
+{{#if isError}}
+<p>Errors happened, see below.</p>
+<ul>
+  {{#each errors}}
+    <li>{{this}}</li>
+  {{/each}}
+</ul>
+{{/if}}
+
+{{#if isDisplayingChanges}}
+  {{#each packs}}
+    <div class="cdm-pack-container">
+      <div class="cdm-pack-header">{{name}} ({{docType}})</div>
+      <div class="cdm-mod-list">
+        <div class="cdm-mod-header">Adds</div>
+        {{#each adds}}
+          <div class="cdm-mod-doc">{{name}}</div>
+        {{/each}}
+      </div>
+      <div class="cdm-mod-list">
+        <div class="cdm-mod-header">Updates</div>
+        {{#each updates}}
+          <div class="cdm-mod-doc">{{name}}</div>
+        {{/each}}
+      </div>
+      <div class="cdm-mod-list">
+        <div class="cdm-mod-header">Deletes</div>
+        {{#each deletes}}
+          <div class="cdm-mod-doc">{{name}}</div>
+        {{/each}}
+      </div>
+    </div>
+  {{/each}}
+{{/if}}
+
+<div class="flexrow">
+  <button type='submit'><i class="fas fa-save"></i>{{localize 'SETTINGS.Save'}}</button>
+  {{!-- <button type='button' data-action="reset"><i class="fas fa-undo"></i>{{localize 'SETTINGS.Reset'}}</button> --}}
+</div>

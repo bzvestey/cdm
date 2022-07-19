@@ -7,5 +7,5 @@ export const Flags = Object.freeze({
 });
 
 export const Templates = Object.freeze({
-  DIALOG: "modules/${this.ID}/templates/cdm.hbs",
+  MAIN_DISPLAY: `modules/${MODULE_ID}/templates/cdm.hbs`,
 });

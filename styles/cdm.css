@@ -1,0 +1,20 @@
+
+.cdm-pack-container {
+  background-color: red;
+}
+
+.cdm-pack-header {
+  background-color: violet;
+}
+
+.cdm-mod-list {
+  background-color: green;
+}
+
+.cdm-mod-header {
+  background-color: brown;
+}
+
+.cdm-mod-doc {
+  background-color: blue;
+}

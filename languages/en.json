@@ -1,5 +1,14 @@
 {
   "cdm": {
-    
+    "dialog": {
+      "title": "Custom Document Manager: Importing Data from Files"
+    },
+    "settings": {
+      "config-menu": {
+        "name": "Update Compendiums",
+        "label": "Update Compendiums",
+        "hint": "This will walk you through the process of updating the compendiums from the supplied files."
+      }
+    }
   }
 }

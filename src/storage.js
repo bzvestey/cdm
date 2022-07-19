@@ -50,7 +50,6 @@ export async function loadFiles() {
   const folder = game.settings.get(MODULE_ID, STORAGE_FOLDER);
   const parent = dataFolder()
   const data = await getAllFiles(parent, folder);
-  Log.info(data)
   return (await Promise.all(data.map(loadFileData))).flat();
 }
 
@@ -63,12 +62,10 @@ export async function loadFiles() {
  */
 async function getAllFiles(parent, dirPath) {
   const data = await FilePicker.browse(parent, dirPath);
-  Log.info(data)
   return data.files.concat((await Promise.all(data.dirs.map(subDir => getAllFiles(parent, subDir)))).flat().filter(Boolean))
 }
 
 async function loadFileData(filePath) {
-  Log.info(filePath)
   const data = await fetch(filePath);
 
   if (data.status !== 200) {
@@ -125,7 +122,11 @@ async function fixFileData(docs, filePath, isYaml) {
       data = new File([JSON.stringify(Array.isArray(docs)? final : final[0], null, 2)], fileName, { type: "application/json"})
     }
 
-    await FilePicker.upload(parent, path, data, {})
+    await FilePicker.upload(parent, path, data, {}).then(resp => {
+      if (!resp) {
+        Log.error(`Updating file ${fileName} at path ${path} failed.`)
+      }
+    })
   }
 
   return final.map(d => updateFileData(d, filePath))
