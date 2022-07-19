@@ -1,7 +1,9 @@
 {
   "cdm": {
     "dialog": {
-      "title": "Custom Document Manager: Importing Data from Files"
+      "title": "Custom Document Manager: Importing Data from Files",
+      "close": "Close",
+      "run": "Make Changes"
     },
     "settings": {
       "config-menu": {

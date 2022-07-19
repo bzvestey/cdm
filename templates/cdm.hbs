@@ -8,6 +8,9 @@
 
 {{#if isDone}}
 <p>Everything is done updating! You can now close this window.</p>
+<div class="flexrow">
+  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
+</div>
 {{/if}}
 
 {{#if isError}}
@@ -17,35 +20,37 @@
     <li>{{this}}</li>
   {{/each}}
 </ul>
+<div class="flexrow">
+  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
+</div>
 {{/if}}
 
 {{#if isDisplayingChanges}}
-  {{#each packs}}
-    <div class="cdm-pack-container">
-      <div class="cdm-pack-header">{{name}} ({{docType}})</div>
-      <div class="cdm-mod-list">
-        <div class="cdm-mod-header">Adds</div>
-        {{#each adds}}
-          <div class="cdm-mod-doc">{{name}}</div>
-        {{/each}}
-      </div>
-      <div class="cdm-mod-list">
-        <div class="cdm-mod-header">Updates</div>
-        {{#each updates}}
-          <div class="cdm-mod-doc">{{name}}</div>
-        {{/each}}
-      </div>
-      <div class="cdm-mod-list">
-        <div class="cdm-mod-header">Deletes</div>
-        {{#each deletes}}
-          <div class="cdm-mod-doc">{{name}}</div>
-        {{/each}}
-      </div>
+{{#each packs}}
+  <div class="cdm-pack-container">
+    <div class="cdm-pack-header">{{name}} ({{docType}})</div>
+    <div class="cdm-mod-list">
+      <div class="cdm-mod-header">Adds</div>
+      {{#each adds}}
+        <div class="cdm-mod-doc">{{name}}</div>
+      {{/each}}
     </div>
-  {{/each}}
-{{/if}}
+    <div class="cdm-mod-list">
+      <div class="cdm-mod-header">Updates</div>
+      {{#each updates}}
+        <div class="cdm-mod-doc">{{name}}</div>
+      {{/each}}
+    </div>
+    <div class="cdm-mod-list">
+      <div class="cdm-mod-header">Deletes</div>
+      {{#each deletes}}
+        <div class="cdm-mod-doc">{{name}}</div>
+      {{/each}}
+    </div>
+  </div>
+{{/each}}
 
 <div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'SETTINGS.Save'}}</button>
-  {{!-- <button type='button' data-action="reset"><i class="fas fa-undo"></i>{{localize 'SETTINGS.Reset'}}</button> --}}
+  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.run'}}</button>
 </div>
+{{/if}}
