@@ -26,12 +26,15 @@ export class CompendiumUpdater extends FormApplication {
    */
   status = CompendiumUpdaterStatus.NOT_STARTED;
 
+  /**
+   * The packs that are being modified based on the data loaded.
+   * 
+   * @type {Array<{ name: string, docType: string, adds: Array<any>, updates: Array<any>, deletes: Array<any> }>}
+   */
   packs = [];
 
-  //
-
-  constructor() {
-    super();
+  constructor(obj) {
+    super(obj);
 
     // Get the information loaded for display in the window.
     this.startPreparingData();
@@ -40,21 +43,19 @@ export class CompendiumUpdater extends FormApplication {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       // classes: [""],
+      template: Templates.MAIN_DISPLAY,
       closeOnSubmit: false,
-      submitOnChange: false,
       submitOnClose: false,
+      submitOnChange: false,
       height: "auto",
       width: "auto",
       resizable: true,
+      minimizable: false,
       popOut: true,
       template: Templates.MAIN_DISPLAY,
       id: `${MODULE_ID}-main-display`,
       title: `${MODULE_ID}.dialog.title`,
     });
-  }
-
-  get template() {
-    return Templates.MAIN_DISPLAY;
   }
 
   getData() {
@@ -70,7 +71,7 @@ export class CompendiumUpdater extends FormApplication {
   }
 
   activateListeners(html) {
-    return super.activateListeners(html);
+    super.activateListeners(html);
   }
 
   async _updateObject(event, formData) {

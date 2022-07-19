@@ -29,20 +29,21 @@
 {{#each packs}}
   <div class="cdm-pack-container">
     <div class="cdm-pack-header">{{name}} ({{docType}})</div>
+    {{!-- Use a sub templates for this... --}}
     <div class="cdm-mod-list">
-      <div class="cdm-mod-header">Adds</div>
+      <div class="cdm-mod-header">Adds ({{adds.length}})</div>
       {{#each adds}}
         <div class="cdm-mod-doc">{{name}}</div>
       {{/each}}
     </div>
     <div class="cdm-mod-list">
-      <div class="cdm-mod-header">Updates</div>
+      <div class="cdm-mod-header">Updates ({{updates.length}})</div>
       {{#each updates}}
         <div class="cdm-mod-doc">{{name}}</div>
       {{/each}}
     </div>
     <div class="cdm-mod-list">
-      <div class="cdm-mod-header">Deletes</div>
+      <div class="cdm-mod-header">Deletes ({{deletes.length}})</div>
       {{#each deletes}}
         <div class="cdm-mod-doc">{{name}}</div>
       {{/each}}
@@ -51,6 +52,6 @@
 {{/each}}
 
 <div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.run'}}</button>
+  <button type='submit' name="submit"><i class="fas fa-save"></i>{{localize 'cdm.dialog.run'}}</button>
 </div>
 {{/if}}
