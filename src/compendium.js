@@ -85,16 +85,20 @@ export class CompendiumUpdater extends FormApplication {
   async startPreparingData() {
     this.status = CompendiumUpdaterStatus.PREPARING;
     const filesByCompendium = await loadInformationFromFiles();
-    this.packs = Object.entries(filesByCompendium).map(([docType, docs]) => {
+    this.packs = await Promise.all(Object.entries(filesByCompendium).map(async ([docType, docs]) => {
       const pack = getPackForDocType(docType);
       return {
         name: pack.metadata.label,
         docType,
-        ...splitByAction(docType, docs),
+        ...(await splitByAction(docType, docs)),
       };
-    });
+    }));
     this.status = CompendiumUpdaterStatus.DISPLAYING;
     this.render();
+  }
+
+  async runChanges() {
+    await pushChanges(this.packs);
   }
 }
 
@@ -169,15 +173,69 @@ function updateDocData(doc) {
   };
 }
 
-function splitByAction(docType, docs) {
+async function splitByAction(docType, docs) {
   const adds = [];
   const updates = [];
   const deletes = [];
 
-  // TODO: Do things...
-  adds.push(...docs);
+  const compendium = getPackForDocType(docType);
+  if (!compendium) { adds, updates, deletes };
+
+  const deleteMissing = true; //TODO: shouldDeleteMissingItems();
+  const compDocs = await getDocsForCompendiumType(docType);
+
+  const cdm = compDocs.reduce((map, cur) => {
+    const id = cur.flags[MODULE_ID]?.[Flags.ID]
+    if (!id) {
+      if (deleteMissing) {
+        deletes.push(cur._id);
+      }
+    } else {
+      map[id] = cur;
+    }
+
+    return map;
+  }, {});
+
+  docs.forEach((doc) => {
+    // TODO: Check setting for forcing unique Names
+    const id = doc.flags[MODULE_ID][Flags.ID]
+    const cd = cdm[id];
+    delete cdm[id];
+
+    if (cd) {
+      updates.push({ old: cd, new: doc });
+    } else {
+      adds.push(doc);
+    }
+  });
+
+  if (deleteMissing) {
+    const cdmv = Object.values(cdm);
+
+    if (cdmv.length) {
+      deletes.push(...cdmv.map(cdm._id));
+    }
+  }
 
   return { adds, updates, deletes };
+}
+
+async function pushChanges(packs) {
+  // if (itemsToDelete.length) {
+  //   Log.info("Items to delete:", itemsToDelete);
+  //   await deleteCompendiumItems("Item", itemsToDelete);
+  // }
+
+  // if (itemsToUpdate.length) {
+  //   Log.info("Items to Update:", itemsToUpdate);
+  //   await Promise.all(itemsToUpdate.map((pair) => pair.old.update(pair.new)));
+  // }
+
+  // if (itemsToCreate.length) {
+  //   Log.info("Items to Create:", itemsToCreate);
+  //   await addCompendiumItems("Item", itemsToCreate);
+  // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
