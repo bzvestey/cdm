@@ -122,7 +122,7 @@ async function fixFileData(docs, filePath, isYaml) {
       data = new File([JSON.stringify(Array.isArray(docs)? final : final[0], null, 2)], fileName, { type: "application/json"})
     }
 
-    await FilePicker.upload(parent, path, data, {}).then(resp => {
+    await FilePicker.upload(parent, path, data, { notify: false }).then(resp => {
       if (!resp) {
         Log.error(`Updating file ${fileName} at path ${path} failed.`)
       }

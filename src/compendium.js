@@ -41,9 +41,9 @@ export class CompendiumUpdater extends FormApplication {
   }
 
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      // classes: [""],
-      template: Templates.MAIN_DISPLAY,
+    return {
+      ...super.defaultOptions,
+      classes: [],
       closeOnSubmit: false,
       submitOnClose: false,
       submitOnChange: false,
@@ -55,7 +55,11 @@ export class CompendiumUpdater extends FormApplication {
       template: Templates.MAIN_DISPLAY,
       id: `${MODULE_ID}-main-display`,
       title: `${MODULE_ID}.dialog.title`,
-    });
+    };
+  }
+
+  get template() {
+    return Templates.MAIN_DISPLAY;
   }
 
   getData() {
@@ -181,8 +185,8 @@ function splitByAction(docType, docs) {
 export function registerCompendiumSettings() {
   const choices = {};
   game.modules.forEach((m) => {
-    Log.info(m.id, m.data.title);
-    choices[m.id] = m.data.title;
+    Log.info(m.id, m.title);
+    choices[m.id] = m.title;
   });
 
   game.settings.register(MODULE_ID, COMPENDIUM_MODULE_SETTING, {

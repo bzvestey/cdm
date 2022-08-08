@@ -35,12 +35,12 @@ export async function createDocuments(fileData) {
     const itemsToCreate = [];
 
     const cim = compItems.reduce((map, cur) => {
-      if (!cur.data.flags[MODULE_ID]) {
+      if (!cur.flags[MODULE_ID]) {
         if (deleteMissing) {
-          itemsToDelete.push(cur.data._id);
+          itemsToDelete.push(cur._id);
         }
       } else {
-        map[cur.data.name] = cur;
+        map[cur.name] = cur;
       }
 
       return map;
@@ -63,7 +63,7 @@ export async function createDocuments(fileData) {
       const cimv = Object.values(cim);
 
       if (cimv.length) {
-        itemsToDelete.push(...cimv.map(cim.data._id));
+        itemsToDelete.push(...cimv.map(cim._id));
       }
 
       if (itemsToDelete.length) {
