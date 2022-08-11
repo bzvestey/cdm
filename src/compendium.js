@@ -49,7 +49,7 @@ export class CompendiumUpdater extends FormApplication {
       submitOnChange: false,
       height: "auto",
       width: "auto",
-      resizable: true,
+      resizable: false,
       minimizable: false,
       popOut: true,
       template: Templates.MAIN_DISPLAY,
@@ -71,15 +71,20 @@ export class CompendiumUpdater extends FormApplication {
       isUpdatingContent: this.status === CompendiumUpdater.MODIFYING,
       isDone: this.status === CompendiumUpdaterStatus.DONE,
       packs: this.packs,
+      submitLabel: this.status == CompendiumUpdater.MODIFYING || this.status === CompendiumUpdaterStatus.DONE ? "cdm.dialog.close" : "cdm.dialog.run",
     };
   }
 
   activateListeners(html) {
     super.activateListeners(html);
+
+    html.find('button').on('click', async (event) => {
+      Log.error(event.currentTarget?.name)
+    });
   }
 
   async _updateObject(event, formData) {
-    Log.error(formData.exampleInput);
+    Log.error(event, formData);
   }
 
   async startPreparingData() {
@@ -162,7 +167,7 @@ function updateDocData(doc) {
     type: doc.type,
     name: doc.name,
     icon: doc.icon,
-    data: doc.data,
+    system: doc.data,
     flags: {
       [MODULE_ID]: {
         [Flags.ERROR]: error,
@@ -188,7 +193,7 @@ async function splitByAction(docType, docs) {
     const id = cur.flags[MODULE_ID]?.[Flags.ID]
     if (!id) {
       if (deleteMissing) {
-        deletes.push(cur._id);
+        deletes.push(cur);
       }
     } else {
       map[id] = cur;
@@ -214,28 +219,30 @@ async function splitByAction(docType, docs) {
     const cdmv = Object.values(cdm);
 
     if (cdmv.length) {
-      deletes.push(...cdmv.map(cdm._id));
+      deletes.push(...cdmv.map(cdm));
     }
   }
 
   return { adds, updates, deletes };
 }
 
-async function pushChanges(packs) {
-  // if (itemsToDelete.length) {
-  //   Log.info("Items to delete:", itemsToDelete);
-  //   await deleteCompendiumItems("Item", itemsToDelete);
-  // }
+async function pushChanges(docType, docs) {
+  const { adds, updates, deletes } = docs
 
-  // if (itemsToUpdate.length) {
-  //   Log.info("Items to Update:", itemsToUpdate);
-  //   await Promise.all(itemsToUpdate.map((pair) => pair.old.update(pair.new)));
-  // }
+  if (deletes.length) {
+    Log.info("Docs to delete:", deletes);
+    await deleteCompendiumItems(docType, deletes);
+  }
 
-  // if (itemsToCreate.length) {
-  //   Log.info("Items to Create:", itemsToCreate);
-  //   await addCompendiumItems("Item", itemsToCreate);
-  // }
+  if (updates.length) {
+    Log.info("Docs to Update:", updates);
+    await Promise.all(updates.map((pair) => pair.old.update(pair.new)));
+  }
+
+  if (adds.length) {
+    Log.info("Docs to Create:", adds);
+    await addCompendiumItems(docType, adds);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,15 +340,16 @@ export function skipAddToCompendium() {
 }
 
 export function getPackForDocType(docType) {
-  const pack = game.modules
-    .get(getCompendiumModule())
-    .packs.find((p) => p.type === docType);
-  return game.packs.get(`${getCompendiumModule()}.${pack.name}`);
+  return game.packs.get(getPackName(docType));
 }
 
-// export function getPackByNameForDocType(docType, name) {
-//   return game.modules.get(getCompendiumModule()).pack.find(p => p.type === docType && p.name === name);
-// }
+function getPackName(docType) {
+  const mod = getCompendiumModule()
+  const pack = game.modules
+    .get(mod)
+    .packs.find((p) => p.type === docType);
+  return `${mod}.${pack.name}`;
+}
 
 export async function getDocsForCompendiumType(docType) {
   if (!skipAddToCompendium()) {
@@ -363,34 +371,56 @@ export async function getDocsForCompendiumType(docType) {
   }
 }
 
-export async function deleteCompendiumItems(docType, ids) {
-  if (shouldDeleteCompendiumItems()) {
-    const c = getPackForDocType(docType);
-    await Promise.all(ids.map((id) => c.delete(id)));
-  }
-
-  if (!shouldDeleteWorldItems()) return;
-
+export async function deleteCompendiumItems(docType, docs) {
+  const ids = docs.map(d => d._id);
   // TODO: Support more than just items
-  switch (docType) {
-    case "Item": {
-      const toDelete = ids.filter((id) => game.items.has(id));
-      if (toDelete.length) {
-        await Item.deleteDocuments(toDelete);
+  if (shouldDeleteCompendiumItems()) {
+    switch (docType) {
+      case "Item": {
+        await Item.deleteDocuments(ids, { pack: getPackName(docType) });
+        break;
+      }
+      default: {
+        Log.error(
+          "Tried to load non-compendium docs for unsupported doc type:",
+          docType
+        );
       }
     }
-    default: {
-      Log.error("Tried to delete unsupported doc type:", docType);
-    }
   }
+
+  // TODO: Support deleting the world item
+  // if (!shouldDeleteWorldItems()) return;
+
+  // // TODO: Support more than just items
+  // switch (docType) {
+  //   case "Item": {
+  //     const toDelete = ids.filter((id) => game.items.has(id));
+  //     if (toDelete.length) {
+  //       await Item.deleteDocuments(toDelete);
+  //     }
+  //   }
+  //   default: {
+  //     Log.error("Tried to delete unsupported doc type:", docType);
+  //   }
+  // }
 }
 
-export async function addCompendiumItems(docType, items) {
+export async function addCompendiumItems(docType, docs) {
   const c = getPackForDocType(docType);
-  if (!c) return;
+  if (!c || docType !== "Items") return;
 
   // TODO: support more than just items
-  const created = await Item.createDocuments(items);
-  await Promise.all(created.map((i) => c.importDocument(i)));
-  await Item.deleteDocuments(created.map((i) => i.id));
+  switch (docType) {
+    case Item.name: {
+      await Item.createDocuments(docs, { pack: getPackName(docType) });
+      break;
+    }
+    default: {
+      Log.error(
+        "Tried to load non-compendium docs for unsupported doc type:",
+        docType
+      );
+    }
+  }
 }

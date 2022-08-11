@@ -1,22 +1,13 @@
 {{#if isLoadingData}}
 <p>The information is being loaded from files and checked against the current status of the world, please wait...</p>
-{{!-- <div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
-</div> --}}
 {{/if}}
 
 {{#if isUpdatingContent}}
 <p>The documents are being updates, please wait...</p>
-{{!-- <div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
-</div> --}}
 {{/if}}
 
 {{#if isDone}}
 <p>Everything is done updating! You can now close this window.</p>
-<div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
-</div>
 {{/if}}
 
 {{#if isError}}
@@ -26,9 +17,6 @@
     <li>{{this}}</li>
   {{/each}}
 </ul>
-<div class="flexrow">
-  <button type='submit'><i class="fas fa-save"></i>{{localize 'cdm.dialog.close'}}</button>
-</div>
 {{/if}}
 
 {{#if isDisplayingChanges}}
@@ -57,8 +45,8 @@
     </div>
   </div>
 {{/each}}
+{{/if}}
 
 <div class="flexrow">
-  <button type='submit' name="submit"><i class="fas fa-save"></i>{{localize 'cdm.dialog.run'}}</button>
+  <button type='submit' name="onsubmit"><i class="fas fa-save"></i>{{localize submitLabel}}</button>
 </div>
-{{/if}}

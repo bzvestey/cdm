@@ -1,11 +1,20 @@
 import YAML from "../node_modules/yaml/browser/index.js";
 import { MODULE_ID } from "./constants.js";
-import { generateNewId } from "./document.js";
 import Log from "./log.js";
 
 const STORAGE_FOLDER = "storage_folder";
 const STORAGE_FOLDER_SOURCE = "storage_folder_source"
 
+/**
+ * Generates a random ID with a prefix from settings or the module ID for compendium content
+ *.
+ * @returns {string} The new ID.
+ */
+ export function generateNewId() {
+  const prefix =
+    /*game.settings.get(MODULE_ID, ID_PREFIX_SETTING) ??*/ getCompendiumModule();
+  return `${prefix}_${crypto.randomUUID()}`;
+}
 
 function dataFolder() {
   return game.settings.get(MODULE_ID, STORAGE_FOLDER_SOURCE);
